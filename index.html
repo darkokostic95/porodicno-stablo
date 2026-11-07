@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15100b">
+  <title>Porodično stablo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=5">
+</head>
+<body class="intro-on">
+  <div class="intro" id="intro">
+    <div class="intro-rays" aria-hidden="true"></div>
+    <div class="intro-inner">
+      <svg class="intro-tree" viewBox="0 0 120 120" aria-hidden="true">
+        <path class="draw" d="M60 112V64M60 84C48 76 40 66 36 52M60 78C72 70 80 60 84 46M60 64C56 52 56 40 60 26M40 58C30 56 24 50 20 42M80 52C90 50 96 44 100 36M60 112C50 114 42 116 32 116M60 112C70 114 78 116 88 116"/>
+        <circle class="dot" cx="60" cy="22" r="4"/><circle class="dot" cx="34" cy="48" r="3.4"/><circle class="dot" cx="86" cy="42" r="3.4"/><circle class="dot" cx="18" cy="39" r="2.8"/><circle class="dot" cx="102" cy="33" r="2.8"/>
+      </svg>
+      <p class="intro-kicker">Porodično stablo</p>
+      <h1 class="intro-title" id="introTitle"></h1>
+      <div class="intro-orn"><i></i><b>❦</b><i></i></div>
+      <p class="intro-sub" id="introSub"></p>
+      <button class="intro-btn" id="introBtn">Uđi u stablo</button>
+      <p class="intro-hint">ili pritisnite Enter</p>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">❦</span>
+      <div>
+        <h1 id="docTitle">Porodično stablo</h1>
+        <span class="save" id="saveState">Sačuvano</span>
+      </div>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-label="Meni">☰</button>
+    <div class="search">
+      <input id="search" type="search" placeholder="Pronađi pretka…" autocomplete="off">
+    </div>
+    <div class="tools">
+      <div class="seg" id="scriptSeg" title="Pismo" translate="no">
+        <button data-v="cyr">Ћир</button><button data-v="lat">Lat</button>
+      </div>
+      <select id="themeSel" title="Tema"></select>
+      <button class="btn ghost" id="archiveBtn" title="O arhivi">Arhiva</button>
+      <button class="btn ghost" id="importBtn" title="Uvezi arhivu (JSON)">Uvezi</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <button class="btn primary" id="exportBtn">Izvezi</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="canvas" id="canvas">
+      <svg id="treeSvg" xmlns="http://www.w3.org/2000/svg"><g id="viewport"></g></svg>
+      <canvas id="ambient" aria-hidden="true"></canvas>
+      <div class="zoom">
+        <button data-z="in" title="Uvećaj">+</button>
+        <button data-z="out" title="Umanji">−</button>
+        <button data-z="fit" title="Prikaži celo stablo">⤢</button>
+        <button data-z="grow" title="Ponovo pusti rast drveta">✦</button>
+      </div>
+    </div>
+    <aside class="panel" id="panel"></aside>
+  </main>
+  <div class="tip" id="tip" aria-hidden="true"></div>
+
+  <div class="modal" id="exportModal" hidden>
+    <div class="modal-card" role="dialog" aria-labelledby="exTitle">
+      <div class="modal-head">
+        <h2 id="exTitle">Izvoz</h2>
+        <button class="x" id="exClose" aria-label="Zatvori">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="preview">
+          <div class="preview-paper" id="exPreview"></div>
+          <p class="preview-meta" id="exMeta"></p>
+        </div>
+        <div class="ex-opts">
+          <section>
+            <h3>Format</h3>
+            <div class="formats" id="exFormats"></div>
+          </section>
+
+          <section data-for="visual">
+            <h3>Izgled</h3>
+            <div class="row">
+              <label>Tema<select id="exTheme"></select></label>
+              <label>Pismo
+                <select id="exScript"><option value="lat">Latinica</option><option value="cyr">Ћирилица</option></select>
+              </label>
+            </div>
+          </section>
+
+          <section data-for="visual">
+            <h3>Papir</h3>
+            <div class="row">
+              <label>Veličina
+                <select id="exPaper">
+                  <option value="auto">Prema stablu</option>
+                  <option value="A4">A4 (21 × 29,7 cm)</option>
+                  <option value="A3">A3 (29,7 × 42 cm)</option>
+                  <option value="A2">A2 (42 × 59,4 cm)</option>
+                  <option value="A1">A1 (59,4 × 84,1 cm)</option>
+                  <option value="50x70">Poster 50 × 70 cm</option>
+                </select>
+              </label>
+              <label>Orijentacija
+                <select id="exOrient">
+                  <option value="auto">Automatski</option>
+                  <option value="land">Položeno</option>
+                  <option value="port">Uspravno</option>
+                </select>
+              </label>
+            </div>
+            <div class="row" data-for="png">
+              <label>Rezolucija slike
+                <select id="exRes">
+                  <option value="2000">Srednja · 2000 px</option>
+                  <option value="4000">Visoka · 4000 px</option>
+                  <option value="7000">Za veliku štampu · 7000 px</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section data-for="visual">
+            <h3>Sadržaj</h3>
+            <div class="row">
+              <label>Obuhvat
+                <select id="exScope">
+                  <option value="all">Cela porodica</option>
+                  <option value="sel">Od izabrane osobe</option>
+                </select>
+              </label>
+              <label>Generacije
+                <select id="exGens">
+                  <option value="0">Sve</option>
+                  <option value="2">2</option><option value="3">3</option>
+                  <option value="4">4</option><option value="5">5</option>
+                </select>
+              </label>
+            </div>
+            <div class="checks">
+              <label><input type="checkbox" id="exPhotos"> Fotografije</label>
+              <label><input type="checkbox" id="exSepia"> Fotografije u sepiji</label>
+              <label><input type="checkbox" id="exYears"> Godine</label>
+              <label><input type="checkbox" id="exMaiden"> Rođeno prezime</label>
+              <label><input type="checkbox" id="exPlaces"> Mesto rođenja</label>
+              <label><input type="checkbox" id="exShowTitle"> Naslov</label>
+            </div>
+            <label class="full">Naslov<input id="exTitleText" type="text"></label>
+            <label class="full">Podnaslov<input id="exSubtitle" type="text"></label>
+          </section>
+
+          <p class="ex-note" id="exNote"></p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="exCancel">Otkaži</button>
+        <button class="btn primary" id="exGo">Preuzmi</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="podaci.js?v=4"></script>
+  <script src="app.js?v=5"></script>
+</body>
+</html>
